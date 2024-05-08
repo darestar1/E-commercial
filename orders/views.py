@@ -5,6 +5,7 @@ from .forms import OrderForm
 from .models import Order, Payment, OrderProduct
 # Create your views here.
 import datetime
+import json
 
 def place_order(request, total=0, quantity=0,):
     current_user = request.user
@@ -67,4 +68,45 @@ def place_order(request, total=0, quantity=0,):
 
 
 def payments(request):
+    body = json.loads(request.body)
+    order = Order.objects.get(user=request.user, is_ordered=False, order_number=body['orderID'])
+
+    # Store transaction details inside Payment model
+    payment = Payment(
+        user = request.user,
+        payment_id = body['transID'],
+        payment_method = body['payment_method'],
+        amount_paid = order.order_total,
+        status = body['status'],
+    )
+    payment.save()
+
+    order.payment = payment
+    order.is_ordered = True
+    order.save()
+    #move card  items to order product
+    cart_items = CartItem.objects.filter(user=request.user)
+
+    for item in cart_items:
+        orderproduct = OrderProduct()
+        orderproduct.order_id = order.id
+        orderproduct.payment = payment
+        orderproduct.user_id = request.user.id
+        orderproduct.product_id = item.product_id
+        orderproduct.quantity = item.quantity
+        orderproduct.product_price = item.product.price
+        orderproduct.ordered = True
+        orderproduct.save()
+
+        cart_item = CartItem.objects.get(id=item.id)
+        product_variation = cart_item.variations.all()
+        orderproduct = OrderProduct.objects.get(id=orderproduct.id)
+        orderproduct.variations.set(product_variation)
+        orderproduct.save()
+
+    #reduce quantity of sold products
+
+    #send order recieved email
+
+    #send order number and transaction id back to
     return render(request,'orders/payments.html')

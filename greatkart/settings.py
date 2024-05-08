@@ -160,3 +160,7 @@ EMAIL_PORT = config('EMAIL_PORT', cast=int,default=587)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER',default="y20798626@gmail.com")
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD',default="gcuv qkuy ujcx tsbu")
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool,default=True)
+
+
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
