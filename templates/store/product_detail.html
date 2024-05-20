@@ -16,7 +16,14 @@
 						</div> <!-- img-big-wrap.// -->
 
 					</article> <!-- gallery-wrap .end// -->
-					
+					<ul class="thumb">
+						<li>
+							<a href="{{ single_product.images.url }}" target="mainImage"><img src="{{ single_product.images.url }}" alt="Product Image"></a>
+							{% for i in product_gallery %}
+							<a href="{{i.image.url}}" target="mainImage"><img src="{{i.image.url}}" alt="Product Image"></a>
+							{% endfor %}
+						</li>
+					</ul>
 				</aside>
 				<main class="col-md-6 border-left">
 
@@ -90,6 +97,7 @@
 				<form action="{% url 'submit_review' single_product.id %}" method="POST">
 					{% csrf_token %}
 					<h5>Write Your Review</h5>
+
 					<div>
 						<!-- Rating stars -->
 						<label>How do you rate this product?</label>
@@ -113,7 +121,7 @@
 						Review:
 						<textarea name="review" rows="4" class="form-control"></textarea>
 						<br>
-						{% if user.is_authenticated %}
+						<!-- {% if user.is_authenticated %}
 							{% if orderproduct %}
 								<input type="submit" value="Submit Review" class="btn btn-primary">
 							{% else %}
@@ -121,20 +129,35 @@
 							{% endif %}
 						{% else %}
 						<p>You must be logged in to post a review. <span><a href="{% url 'login' %}">Login now</a></span></p>
-						{% endif %}
+						{% endif %} -->
 
-						
-						
+						{% if user.is_authenticated %}
+								<input type="submit" value="Submit Review" class="btn btn-primary">
+						{% else %}
+						<p>You must be logged in to post a review. <span><a href="{% url 'login' %}">Login now</a></span></p>
+						{% endif %}
+						<div class="alert alert-danger" role="alert" style="margin-top:10px;">
+  2-Factor Review Submission is disabled for demo purpose.
+</div>
 
 					</div>
 {% include 'includes/alerts.html' %}
 				</form>
-				<br>
-				<header class="section-heading">
-					<h3>Customer Reviews </h3>
-					
-				
-				</header>
+<br>
+<header class="section-heading">
+	<h3>Customer Reviews </h3>
+	<div class="rating-star">
+		<span>
+			<i class="fa fa-star{% if single_product.averageReview < 0.5 %}-o{% elif single_product.averageReview >= 0.5 and single_product.averageReview < 1 %}-half-o {% endif %}" aria-hidden="true"></i>
+			<i class="fa fa-star{% if single_product.averageReview < 1.5 %}-o{% elif single_product.averageReview >= 1.5 and single_product.averageReview < 2 %}-half-o {% endif %}" aria-hidden="true"></i>
+			<i class="fa fa-star{% if single_product.averageReview < 2.5 %}-o{% elif single_product.averageReview >= 2.5 and single_product.averageReview < 3 %}-half-o {% endif %}" aria-hidden="true"></i>
+			<i class="fa fa-star{% if single_product.averageReview < 3.5 %}-o{% elif single_product.averageReview >= 3.5 and single_product.averageReview < 4 %}-half-o {% endif %}" aria-hidden="true"></i>
+			<i class="fa fa-star{% if single_product.averageReview < 4.5 %}-o{% elif single_product.averageReview >= 4.5 and single_product.averageReview < 5 %}-half-o {% endif %}" aria-hidden="true"></i>
+	<span>{{single_product.countReview}} reviews</span>
+			</span>
+	</div>
+
+</header>
 
 {% for review in reviews %}
 				<article class="box mb-3">
@@ -142,7 +165,7 @@
 
 						<div class="text">
 							<span class="date text-muted float-md-right">{{review.updated_at}} </span>
-							<h6 class="mb-1">{{review.user.first_name}} </h6>
+							<h6 class="mb-1">{{review.user.full_name}} </h6>
 							<div class="rating-star">
 								<span>
 									<i class="fa fa-star{% if review.rating == 0.5 %}-half-o{% elif review.rating < 1 %}-o {% endif %}" aria-hidden="true"></i>
